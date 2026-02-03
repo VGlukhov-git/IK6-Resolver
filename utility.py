@@ -39,11 +39,17 @@ def solve_kinematics(A, T_angles, L, R, H, dL):
         v_th, v_ph, alpha = p
         
         V = np.array([np.sin(v_th)*np.cos(v_ph), np.sin(v_th)*np.sin(v_ph), np.cos(v_th)])
-        dCA = np.cross(V, T_vec)
+        dCA = np.cross(-V, T_vec)
         if np.linalg.norm(dCA) < 1e-9: return [1e6, 1e6, 1e6]
         dCA /= np.linalg.norm(dCA)
         C, S = A - dCA * R, A - dCA * R + V * H
+        
         dL_vec = np.array([np.cos(alpha), np.sin(alpha), 0.0]) * dL
+        
+        ref = A - S                      # or S - C depending on your convention
+        if np.dot(dL_vec, ref) < 0:
+            dL_vec = -dL_vec
+            alpha += np.pi
         L_proj = (S - dL_vec)[:2]
         eq1 = np.dot(L_proj, dL_vec[:2])
         eq2 = np.linalg.norm(S - dL_vec) - L
@@ -73,9 +79,14 @@ def solve_kinematics(A, T_angles, L, R, H, dL):
         last_guess = res
         v_t, v_p, alpha = res
         V = np.array([np.sin(v_t)*np.cos(v_p), np.sin(v_t)*np.sin(v_p), np.cos(v_t)])
-        dCA = np.cross(V, T_vec); dCA /= np.linalg.norm(dCA)
+        dCA = np.cross(-V, T_vec); dCA /= np.linalg.norm(dCA)
         C, S = A - dCA * R, A - dCA * R + V * H
         dL_v = np.array([np.cos(alpha), np.sin(alpha), 0.0]) * dL
+
+        ref = A - S                      # or S - C depending on your convention
+        if np.dot(dL_v, ref) < 0:
+            dL_v = -dL_v
+            alpha += np.pi
         
         a1 = np.degrees(alpha)
         vec_L = S - dL_v

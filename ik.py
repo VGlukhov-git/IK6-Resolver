@@ -9,7 +9,7 @@ dL_val = -20.0
 T_angles = [0.0, 0.0]
 
 # Параметры КУБА
-cube_center = np.array([300.0, 200.0, 100.0])
+cube_center = np.array([400.0, 100.0, 100.0])
 cube_size = 200.0 
 half = cube_size / 2
 
