@@ -47,16 +47,12 @@ def solve_kinematics(A, T_angles, L, R, H, dL):
         dL_vec = np.array([np.cos(alpha), np.sin(alpha), 0.0]) * dL
         
         ref = A - S                      # or S - C depending on your convention
-        if np.dot(dL_vec, ref) < 0:
+        if np.dot(dL_vec, ref) < 0 and alpha < 0:
             dL_vec = -dL_vec
             alpha += np.pi
         L_proj = (S - dL_vec)[:2]
         eq1 = np.dot(L_proj, dL_vec[:2])
         eq2 = np.linalg.norm(S - dL_vec) - L
-        # plane_normal = np.cross(S - dL_vec, [0, 0, 1])
-        # eq3 = np.dot(C - dL_vec, plane_normal)
-        # eq3 = L_proj[0]*(C-dL_vec)[1] - L_proj[1]*(C-dL_vec)[0]
-        # n = np.linalg.norm(plane_normal)
         Z = np.array([0.0, 0.0, 1.0])
         n = np.cross(C, Z)
         nn = np.linalg.norm(n)
@@ -65,13 +61,6 @@ def solve_kinematics(A, T_angles, L, R, H, dL):
         else:
             n /= nn
             eq3 = np.dot(S, n)  
-        # if n < 1e-6:
-        #     eq3 = (1e-6 - n) * 1e3
-        # else:
-        #     plane_normal /= n
-        #     eq3 = np.dot(C - dL_vec, plane_normal)
-        penalty = 0
-        if S[2] < A[2]: penalty = (A[2] - S[2]) ** 2
         return [eq1, eq2, eq3]
 
     res, info, ier, msg = fsolve(equations, last_guess, full_output=True)
@@ -82,9 +71,8 @@ def solve_kinematics(A, T_angles, L, R, H, dL):
         dCA = np.cross(-V, T_vec); dCA /= np.linalg.norm(dCA)
         C, S = A - dCA * R, A - dCA * R + V * H
         dL_v = np.array([np.cos(alpha), np.sin(alpha), 0.0]) * dL
-
         ref = A - S                      # or S - C depending on your convention
-        if np.dot(dL_v, ref) < 0:
+        if np.dot(dL_v, ref) < 0 and alpha < 0:
             dL_v = -dL_v
             alpha += np.pi
         
